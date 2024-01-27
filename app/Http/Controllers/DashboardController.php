@@ -53,9 +53,10 @@ class DashboardController extends Controller
         return response()->json(['resource' => $resource, 'systime' => $systime, 'active_users_count' => $active_users_count]);
     }
 
-    public function getTrafficData()
+    public function getTrafficData(Request $request)
     {
         $device = Device::first();
+        $interface = $request->get('interface');
 
         if (!$device) {
             return response()->json(['error' => true, 'message' => 'No device found in the database.']);
@@ -76,7 +77,7 @@ class DashboardController extends Controller
             return response()->json(['error' => true, 'message' => 'Device not connected ...']);
         }
         $query = (new Query('/interface/monitor-traffic'))
-            ->equal('interface', 'ether1')
+            ->equal('interface', $interface)
             ->equal('once', true);
 
         $interfaceTraffic = $client->query($query)->read()[0];
@@ -90,4 +91,34 @@ class DashboardController extends Controller
 
         return response()->json($data);
     }
+
+    public function getInterfaceNames()
+{
+    $device = Device::first();
+
+    if (!$device) {
+        return response()->json(['error' => true, 'message' => 'No device found in the database.']);
+    }
+
+    try {
+        $client = new Client([
+            'host' => $device->ip_address,
+            'user' => $device->login,
+            'pass' => $device->password,
+            'port' => 8728,
+        ]);
+
+        $query = (new Query('/interface/print'));
+        $interfaces = $client->query($query)->read();
+
+        $interfaceNames = array_map(function($interface) {
+            return isset($interface['name']) ? $interface['name'] : null;
+        }, $interfaces);
+
+        return response()->json($interfaceNames);
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => true, 'message' => 'Device not connected ...']);
+    }
+}
 }

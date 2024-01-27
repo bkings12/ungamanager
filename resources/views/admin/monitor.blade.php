@@ -4,6 +4,13 @@
 @endsection
 
 @section('content')
+<select id="intervalSelect">
+    <option value="5">5 seconds</option>
+    <option value="60">1 minute</option>
+    <option value="300">5 minutes</option>
+    <option value="600">10 minutes</option>
+    <option value="900">15 minutes</option>
+</select>
 <div id="interface-table">
     <!-- The table will be inserted here by JavaScript -->
 </div>
@@ -74,6 +81,29 @@ function getColor(speed) {
 }
 
 fetchInterfaceData();
-setInterval(fetchInterfaceData, 5000);
+var intervalSelect = document.getElementById('intervalSelect');
+
+// Load the selected interval from localStorage
+var savedInterval = localStorage.getItem('selectedInterval');
+if (savedInterval) {
+    intervalSelect.value = savedInterval;
+}
+
+intervalSelect.addEventListener('change', function() {
+    // Clear the existing interval
+    if (window.fetchInterfaceDataInterval) {
+        clearInterval(window.fetchInterfaceDataInterval);
+    }
+
+    // Set a new interval with the selected value
+    var seconds = parseInt(this.value);
+    window.fetchInterfaceDataInterval = setInterval(fetchInterfaceData, seconds * 1000);
+
+    // Save the selected interval to localStorage
+    localStorage.setItem('selectedInterval', this.value);
+});
+
+// Trigger the change event to set the initial interval
+intervalSelect.dispatchEvent(new Event('change'));
 </script>
 @endsection

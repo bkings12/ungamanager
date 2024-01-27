@@ -35,7 +35,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/admin/monitor', [MonitorController::class, 'inview'])->name('admin.monitor');
-
+    Route::get('/admin/generate', [MonitorController::class, 'showGenerateReportForm'])->name('admin.showGenerate');
+Route::post('/admin/generate', [MonitorController::class, 'generateReport'])->name('admin.generate');
 });
 
 require __DIR__.'/auth.php';

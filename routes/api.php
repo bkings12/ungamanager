@@ -22,4 +22,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('traffic-data', [DashboardController::class, 'getTrafficData']);
 Route::get('resource', [DashboardController::class, 'resource']);
 Route::get('monitor', [MonitorController::class,'monitor']);
+Route::get('interface-names', [DashboardController::class, 'getInterfaceNames']);
+
 
